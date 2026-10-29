@@ -33,10 +33,16 @@ anzeigt und neue oder geänderte Kursdateien automatisch in einen Ordner deiner 
   sondern als `Name (neue Version JJJJ-MM-TT HH-mm).ext` daneben gespeichert.
 - Wurde eine Datei in ILIAS gelöscht, bleibt die lokale Kopie erhalten.
 
+## Download
+
+Fertige App (Universal: Apple Silicon und Intel) unter **[Releases](https://github.com/dev-prophet-code/ILIASsynchMac/releases/latest)**:
+`ILIASSync-…-macOS.zip` laden, entpacken und `ILIASSync.app` nach „Programme" ziehen.
+Beim ersten Start: Rechtsklick → **Öffnen** (die App ist nicht notarisiert, siehe unten).
+
 ## Voraussetzungen
 
 - macOS 13 oder neuer
-- Zum Bauen: Xcode (inkl. akzeptierter Lizenz) – die SwiftUI-Makros brauchen die Xcode-Toolchain
+- Zum selbst Bauen: Xcode (inkl. akzeptierter Lizenz) – die SwiftUI-Makros brauchen die Xcode-Toolchain
 
 ## Bauen
 
@@ -48,7 +54,7 @@ open build/ILIASSync.app
 ```
 
 `build.sh` baut das Swift-Package im Release-Modus, erzeugt `build/ILIASSync.app` (mit Icon, `LSUIElement`)
-und signiert es ad hoc. Liegt Xcode nicht unter `/Applications/Xcode.app`, setze `DEVELOPER_DIR` entsprechend.
+und signiert es ad hoc. Der Build ist universal (arm64 + x86_64). Liegt Xcode nicht unter `/Applications/Xcode.app`, setze `DEVELOPER_DIR` entsprechend.
 
 ### Weitergeben
 
@@ -77,7 +83,6 @@ Der lokale Sync-Status liegt in `~/Library/Application Support/ILIASSync/state.j
 - Kein Single-Sign-on (Shibboleth, CAS, …), nur Anmeldung mit Benutzername und Passwort
 - Es werden nur Dateien geladen, keine Lernmodule, Foren, Links oder Gruppenordner
 - Das Auslesen der HTML-Seiten kann bei anderen ILIAS-Versionen/Themes abweichen
-- Der Standard-Build passt zur Architektur des Build-Rechners (Apple Silicon auf einem M-Mac)
 
 ## Lizenz
 

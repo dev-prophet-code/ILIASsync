@@ -2,10 +2,10 @@
 set -e
 cd "$(dirname "$0")"
 export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
-swift build -c release
+swift build -c release --arch arm64 --arch x86_64
 APP=build/ILIASSync.app
 rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS"
-cp .build/release/ILIASSync "$APP/Contents/MacOS/"
+cp "$(find .build -path "*Products/Release/ILIASSync" -type f | head -1)" "$APP/Contents/MacOS/"
 mkdir -p "$APP/Contents/Resources"; cp Resources/AppIcon.icns "$APP/Contents/Resources/"
 cat > "$APP/Contents/Info.plist" <<PL
 <?xml version="1.0" encoding="UTF-8"?>

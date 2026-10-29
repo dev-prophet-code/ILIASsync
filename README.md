@@ -35,10 +35,16 @@ system and automatically downloads new or changed course files into a folder of 
   saved next to it as `Name (neue Version YYYY-MM-DD HH-mm).ext`.
 - If a file is removed in ILIAS, your local copy stays.
 
+## Download
+
+A ready-to-run app (universal: Apple Silicon and Intel) is available under **[Releases](https://github.com/dev-prophet-code/ILIASsynchMac/releases/latest)**:
+download `ILIASSync-…-macOS.zip`, unzip it and drag `ILIASSync.app` to Applications.
+On first launch: right-click → **Open** (the app is not notarized, see below).
+
 ## Requirements
 
 - macOS 13 or newer
-- To build: Xcode (with the license accepted). The SwiftUI macros need the Xcode toolchain.
+- To build it yourself: Xcode (with the license accepted). The SwiftUI macros need the Xcode toolchain.
 
 ## Build
 
@@ -50,7 +56,7 @@ open build/ILIASSync.app
 ```
 
 `build.sh` builds the Swift package in release mode, creates `build/ILIASSync.app` (with icon and `LSUIElement`) and
-signs it ad hoc. If Xcode is not at `/Applications/Xcode.app`, set `DEVELOPER_DIR` accordingly.
+signs it ad hoc. The build is universal (arm64 + x86_64). If Xcode is not at `/Applications/Xcode.app`, set `DEVELOPER_DIR` accordingly.
 
 ### Distribution
 
@@ -79,7 +85,6 @@ The local sync state is kept in `~/Library/Application Support/ILIASSync/state.j
 - No single sign-on (Shibboleth, CAS, …), only username and password login
 - Only files are downloaded, not learning modules, forums, links or group folders
 - Parsing the HTML pages may differ on other ILIAS versions or themes
-- The default build targets the architecture of the build machine (Apple Silicon on an M-series Mac)
 
 ## License
 
