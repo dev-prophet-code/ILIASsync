@@ -5,8 +5,12 @@
 Kleine macOS-Menüleisten-App, die deine Kurse aus einem [ILIAS](https://github.com/ILIAS-eLearning/ILIAS)-System
 anzeigt und neue oder geänderte Kursdateien automatisch in einen Ordner deiner Wahl herunterlädt.
 
-> **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet
+> **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
 > Andere Versionen und Themes können Anpassungen brauchen.
+
+## Screenshot
+
+<p align="center"><img src="docs/screenshot-einstellungen.png" width="360" alt="Einstellungsfenster (Demo-Daten)"></p>
 
 ## Funktionen
 
