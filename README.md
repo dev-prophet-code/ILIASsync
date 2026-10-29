@@ -11,6 +11,9 @@ system and automatically downloads new or changed course files into a folder of 
 > Other versions and themes may need adjustments.
 > **Note:** the app's user interface is in German.
 
+**Keywords:** ILIAS sync, ILIAS downloader, ILIAS client for macOS, synchronize ILIAS courses, ILIAS course files offline,
+ILIAS menu bar app, e-learning, LMS, Swift, SwiftUI.
+
 ## Screenshot
 
 <p align="center"><img src="docs/screenshot-einstellungen.png" width="360" alt="Settings window (demo data)"></p>
@@ -37,7 +40,7 @@ system and automatically downloads new or changed course files into a folder of 
 
 ## Download
 
-A ready-to-run app (universal: Apple Silicon and Intel) is available under **[Releases](https://github.com/dev-prophet-code/ILIASsynchMac/releases/latest)**:
+A ready-to-run app (universal: Apple Silicon and Intel) is available under **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
 download `ILIASSync-…-macOS.zip`, unzip it and drag `ILIASSync.app` to Applications.
 On first launch: right-click → **Open** (the app is not notarized, see below).
 
@@ -49,8 +52,8 @@ On first launch: right-click → **Open** (the app is not notarized, see below).
 ## Build
 
 ```bash
-git clone https://github.com/dev-prophet-code/ILIASsynchMac.git
-cd ILIASsynchMac
+git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
+cd ILIASsyncMac
 ./build.sh
 open build/ILIASSync.app
 ```

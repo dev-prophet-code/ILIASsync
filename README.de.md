@@ -10,6 +10,9 @@ anzeigt und neue oder geänderte Kursdateien automatisch in einen Ordner deiner 
 > **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
 > Andere Versionen und Themes können Anpassungen brauchen.
 
+**Stichworte:** ILIAS synchronisieren, ILIAS Kurse herunterladen, ILIAS Mac-App, ILIAS Dateien offline,
+ILIAS Menüleiste, E-Learning, Lernplattform, Swift, SwiftUI.
+
 ## Screenshot
 
 <p align="center"><img src="docs/screenshot-einstellungen.png" width="360" alt="Einstellungsfenster (Demo-Daten)"></p>
@@ -35,7 +38,7 @@ anzeigt und neue oder geänderte Kursdateien automatisch in einen Ordner deiner 
 
 ## Download
 
-Fertige App (Universal: Apple Silicon und Intel) unter **[Releases](https://github.com/dev-prophet-code/ILIASsynchMac/releases/latest)**:
+Fertige App (Universal: Apple Silicon und Intel) unter **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
 `ILIASSync-…-macOS.zip` laden, entpacken und `ILIASSync.app` nach „Programme" ziehen.
 Beim ersten Start: Rechtsklick → **Öffnen** (die App ist nicht notarisiert, siehe unten).
 
@@ -47,8 +50,8 @@ Beim ersten Start: Rechtsklick → **Öffnen** (die App ist nicht notarisiert, s
 ## Bauen
 
 ```bash
-git clone https://github.com/dev-prophet-code/ILIASsynchMac.git
-cd ILIASsynchMac
+git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
+cd ILIASsyncMac
 ./build.sh
 open build/ILIASSync.app
 ```
