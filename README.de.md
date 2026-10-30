@@ -45,7 +45,8 @@ Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsync/re
 - Menü: **Meine Kurse** (öffnet den Kurs im Browser), **Jetzt synchronisieren**, **Sync-Ordner öffnen**, **Einstellungen**
 - Lädt Dateien aus Kursen und Unterordnern und bildet die Ordnerstruktur lokal nach
 - Einzelne Kurse lassen sich vom Sync ausnehmen
-- Optional: Start beim Anmelden, Benachrichtigung bei neuen Dateien
+- Hinweis **„Neue Daten synchronisiert“** nach jedem Sync, der neue oder aktualisierte Dateien lädt
+- Optional: Start beim Anmelden
 - Das Passwort wird sicher gespeichert: macOS-Schlüsselbund bzw. Windows-DPAPI (für dein Benutzerkonto verschlüsselt)
 
 ## Sicherheit der lokalen Daten
@@ -56,13 +57,16 @@ Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsync/re
 - Ist eine Datei in ILIAS neu hochgeladen worden und weicht von der lokalen ab, wird sie **nicht überschrieben**,
   sondern als `Name (neue Version JJJJ-MM-TT HH-mm).ext` daneben gespeichert.
 - Wurde eine Datei in ILIAS gelöscht, bleibt die lokale Kopie erhalten.
+- Es werden nur `https://`-Adressen akzeptiert (Zugangsdaten gehen nie unverschlüsselt raus).
+- Lehnt ILIAS die Zugangsdaten ab, pausieren die automatischen Syncs, bis du sie neu speicherst – ein falsches Passwort kann dein Konto also nicht sperren.
 
 ## Benutzung
 
 1. App starten – beim ersten Mal öffnet sich das Einstellungsfenster.
 2. ILIAS-Adresse (z. B. `https://ilias.uni-beispiel.de`), Benutzername und Passwort eintragen, Sync-Ordner wählen.
 3. **Speichern & Verbinden**. Die App meldet sich an, zeigt die Zahl der Kurse und startet den ersten Sync.
-4. Fenster schließen. Das Symbol bleibt in Menüleiste bzw. Infobereich; die Einstellungen erreichst du über das Menü
+4. Nach jedem Sync mit neuen oder geänderten Dateien erscheint der Hinweis „Neue Daten synchronisiert“ (unter macOS Mitteilungen erlauben, wenn gefragt).
+5. Fenster schließen. Das Symbol bleibt in Menüleiste bzw. Infobereich; die Einstellungen erreichst du über das Menü
    (macOS: auch durch erneutes Starten der App; Windows: Doppelklick auf das Symbol).
 
 ## Selbst bauen
@@ -105,6 +109,11 @@ Die Änderungserkennung nutzt `Last-Modified`/`Content-Length` und den SHA-256-H
 
 Lokaler Sync-Status: macOS `~/Library/Application Support/ILIASSync/state.json`,
 Windows `%APPDATA%\ILIASSync\state.json`.
+
+## Änderungen
+
+- **0.2.0** – Hinweis „Neue Daten synchronisiert“; nur https; automatische Syncs pausieren nach abgelehnten Zugangsdaten; HTTP-Fehler und abgelaufene Sitzungen werden gemeldet statt „Alles aktuell“; weniger doppelte Downloads (macOS: eine Anfrage, versionierte Dateien nicht mehr neu geladen); Windows: Zweitstart wirft keine Exception mehr. Getestet unter macOS und Windows.
+- **0.1.0** – Erste Version.
 
 ## Bekannte Einschränkungen
 

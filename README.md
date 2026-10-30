@@ -47,7 +47,8 @@ Ready-to-run apps are available under **[Releases](https://github.com/dev-prophe
   **Sync-Ordner öffnen** (open sync folder), **Einstellungen** (settings)
 - Downloads files from courses and subfolders and mirrors the folder structure locally
 - Individual courses can be excluded from syncing
-- Optional: launch at login, notification when new files arrive
+- Notification **"Neue Daten synchronisiert"** (new data synced) whenever a sync downloads new or updated files
+- Optional: launch at login
 - The password is stored securely: macOS Keychain / Windows DPAPI (encrypted for your user account)
 
 ## Safety of your local data
@@ -58,13 +59,16 @@ Ready-to-run apps are available under **[Releases](https://github.com/dev-prophe
 - If a file was re-uploaded in ILIAS and differs from your local copy, it is **not overwritten**; the new version is
   saved next to it as `Name (neue Version YYYY-MM-DD HH-mm).ext`.
 - If a file is removed in ILIAS, your local copy stays.
+- Only `https://` server addresses are accepted (so credentials are never sent unencrypted).
+- If ILIAS rejects your credentials, automatic syncs pause until you save them again, so a wrong password cannot lock your account.
 
 ## Usage
 
 1. Start the app. On first launch the settings window opens.
 2. Enter the ILIAS address (e.g. `https://ilias.uni-beispiel.de`), username and password, and choose a sync folder.
 3. Click **Speichern & Verbinden** (save & connect). The app logs in, shows the number of courses and starts the first sync.
-4. Close the window. The icon stays in the menu bar / tray; open the settings again from its menu
+4. After each sync that brings new or changed files you get the notification "Neue Daten synchronisiert" (on macOS, allow notifications when asked).
+5. Close the window. The icon stays in the menu bar / tray; open the settings again from its menu
    (macOS: also by launching the app again; Windows: double-click the tray icon).
 
 ## Build it yourself
@@ -107,6 +111,11 @@ Change detection uses `Last-Modified`/`Content-Length` and the SHA-256 hash.
 
 Local sync state: macOS `~/Library/Application Support/ILIASSync/state.json`,
 Windows `%APPDATA%\ILIASSync\state.json`.
+
+## Changelog
+
+- **0.2.0** – Notification "Neue Daten synchronisiert"; https only; automatic syncs pause after rejected credentials; HTTP errors and expired sessions are reported instead of "all up to date"; fewer redundant downloads (macOS: single request, versioned files no longer re-downloaded); Windows: second launch no longer throws. Tested on macOS and Windows.
+- **0.1.0** – First release.
 
 ## Known limitations
 
