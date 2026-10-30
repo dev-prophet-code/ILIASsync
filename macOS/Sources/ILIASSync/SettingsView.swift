@@ -79,6 +79,7 @@ struct SettingsView: View {
             settings.serverURL = server
             settings.username = username; settings.password = password
             settings.syncFolder = folder
+            engine.resetLoginBlock()
             engine.courses = courses
             message = "Verbunden – \(courses.count) Kurse gefunden. Synchronisierung läuft."
             Task { await engine.syncNow() }

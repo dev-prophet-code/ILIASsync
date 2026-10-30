@@ -13,11 +13,14 @@ struct SyncStats {
 }
 
 enum ILIASError: LocalizedError {
-    case badURL, loginFailed(String), noCourses
+    case badURL, insecure, loginFailed(String), noCourses, http(Int), sessionLost
     var errorDescription: String? {
         switch self {
         case .badURL: return "Die Server-Adresse ist ungültig."
         case .loginFailed(let m): return "Anmeldung fehlgeschlagen" + (m.isEmpty ? "." : ": \(m)")
+        case .insecure: return "Bitte eine https://-Adresse verwenden, sonst würden Zugangsdaten unverschlüsselt gesendet."
+        case .http(let c): return "Server antwortet mit HTTP \(c)."
+        case .sessionLost: return "Sitzung nicht angemeldet bzw. abgelaufen (ggf. Nutzungsbedingungen oder Passwortwechsel im Browser bestätigen)."
         case .noCourses: return "Keine Kurse gefunden (Seitenstruktur nicht erkannt oder keine Mitgliedschaften)."
         }
     }
@@ -53,6 +56,7 @@ final class ILIASClient {
         for tail in ["/login.php", "/ilias.php", "/index.php"] where s.hasSuffix(tail) { s.removeLast(tail.count) }
         while s.hasSuffix("/") { s.removeLast() }
         guard let u = URL(string: s), u.host != nil else { throw ILIASError.badURL }
+        guard u.scheme == "https" || ["localhost", "127.0.0.1", "::1"].contains(u.host ?? "") else { throw ILIASError.insecure }
         base = u
         let cfg = URLSessionConfiguration.ephemeral
         cfg.httpCookieAcceptPolicy = .always
@@ -63,33 +67,35 @@ final class ILIASClient {
     // MARK: URLs
 
     private func url(_ path: String, _ query: String = "") -> URL {
-        var q = query
-        return URL(string: base.absoluteString + "/" + path + (q.isEmpty ? "" : "?" + q))!
+        URL(string: base.absoluteString + "/" + path + (query.isEmpty ? "" : "?" + query))!
     }
     func gotoURL(_ type: String, _ ref: String, suffix: String = "") -> URL {
         url("goto.php", "target=\(type)_\(ref)\(suffix)")
     }
     func courseWebURL(_ c: Course) -> URL { gotoURL(c.type, c.id) }
 
-    private func fetch(_ u: URL) async throws -> (html: String, url: URL) {
+    private func fetch(_ u: URL, requireSession: Bool = true) async throws -> (html: String, url: URL) {
         let (data, resp) = try await session.data(from: u)
+        if let code = (resp as? HTTPURLResponse)?.statusCode, !(200..<300).contains(code) { throw ILIASError.http(code) }
         let html = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+        if requireSession && html.contains("type=\"password\"") { throw ILIASError.sessionLost }
         return (html, resp.url ?? u)
     }
 
     // MARK: Login
 
     func login(username: String, password: String) async throws {
-        let (html, pageURL) = try await fetch(url("login.php"))
+        let (html, pageURL) = try await fetch(url("login.php"), requireSession: false)
         guard let form = HTML.form(containing: "type=\"password\"", in: html) else {
             throw ILIASError.loginFailed("Anmeldeformular nicht gefunden – stimmt die Server-Adresse?")
         }
         var fields: [(String, String)] = []
         var userDone = false, passDone = false
+        var passName = ""
         for f in form.fields {
             switch f.type {
             case "hidden": fields.append((f.name, f.value))
-            case "password" where !passDone: fields.append((f.name, password)); passDone = true
+            case "password" where !passDone: fields.append((f.name, password)); passDone = true; passName = f.name
             case "text" where !userDone: fields.append((f.name, username)); userDone = true
             case "submit" where f.name.hasPrefix("cmd"): fields.append((f.name, f.value))
             default: break
@@ -108,7 +114,8 @@ final class ILIASClient {
 
         let (data, _) = try await session.data(for: req)
         let result = String(decoding: data, as: UTF8.self)
-        if result.contains("type=\"password\"") {
+        // Fehlgeschlagen = das Login-Passwortfeld ist noch da; andere Seiten (Zwischenschritte) fängt fetch() ab.
+        if result.contains("name=\"\(passName)\"") {
             let msg = HTML.matches("alert-danger[^>]*>(.{0,400})", in: result).first
                 .map { HTML.stripTags($0[1]).replacingOccurrences(of: "Fehlermeldung", with: "").components(separatedBy: "<")[0].trimmingCharacters(in: .whitespaces) } ?? ""
             throw ILIASError.loginFailed(msg.isEmpty ? "Anmeldename oder Passwort ungültig." : msg)
@@ -121,7 +128,10 @@ final class ILIASClient {
         let pages = [url("ilias.php", "baseClass=ilmembershipoverviewgui"),
                      url("ilias.php", "baseClass=ilDashboardGUI&cmd=jumpToSelectedItems")]
         for p in pages {
-            guard let (html, _) = try? await fetch(p) else { continue }
+            let html: String
+            do { html = try await fetch(p).html }
+            catch ILIASError.sessionLost { throw ILIASError.sessionLost }
+            catch { continue }
             var order: [String] = []
             var found: [String: Course] = [:]
             for a in HTML.anchors(in: html) {
@@ -191,15 +201,25 @@ final class ILIASClient {
         let key = "file_\(ref)"
         let fm = FileManager.default
         let local = fm.fileExists(atPath: dest.path)
-        if let e = state[key], e.sig == sig, e.path == dest.path, local {
+        if let e = state[key], e.sig == sig, fm.fileExists(atPath: e.path) {
             bytes.task.cancel(); stats.unchanged += 1; return
         }
-        bytes.task.cancel()
 
-        // Datei laden und per SHA-256 mit dem Vorhandenen abgleichen.
-        let (tmp, _) = try await session.download(from: u)
-        defer { try? fm.removeItem(at: tmp) }   // nur die temporäre Download-Datei
-        let remoteHash = try Self.sha256(tmp)
+        // Datei in eine temporäre Datei streamen (eine einzige Anfrage) und dabei den SHA-256 berechnen.
+        let tmp = fm.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        fm.createFile(atPath: tmp.path, contents: nil)
+        let out = try FileHandle(forWritingTo: tmp)
+        var moved = false
+        defer { try? out.close(); if !moved { try? fm.removeItem(at: tmp) } }   // nur die temporäre Download-Datei
+        var hasher = SHA256()
+        var buf = Data(); buf.reserveCapacity(1 << 18)
+        for try await b in bytes {
+            buf.append(b)
+            if buf.count >= 1 << 18 { try out.write(contentsOf: buf); hasher.update(data: buf); buf.removeAll(keepingCapacity: true) }
+        }
+        if !buf.isEmpty { try out.write(contentsOf: buf); hasher.update(data: buf) }
+        try out.close()
+        let remoteHash = hasher.finalize().map { String(format: "%02x", $0) }.joined()
 
         if local, try Self.sha256(dest) == remoteHash {
             state[key] = SyncEntry(sig: sig, path: dest.path, hash: remoteHash)
@@ -225,6 +245,7 @@ final class ILIASClient {
             }
         }
         try fm.moveItem(at: tmp, to: target)
+        moved = true
         state[key] = SyncEntry(sig: sig, path: target.path, hash: remoteHash)
         if local { stats.updated += 1 } else { stats.new += 1 }
     }

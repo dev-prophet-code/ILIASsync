@@ -13,6 +13,7 @@ public partial class App : System.Windows.Application
     public static SyncEngine Engine { get; } = new();
 
     private Mutex? _mutex;
+    private bool _ownsMutex;
     private NotifyIcon? _tray;
     private ToolStripMenuItem? _statusItem;
     private SettingsWindow? _settings;
@@ -22,11 +23,12 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
 
         _mutex = new Mutex(true, "ILIASSync.SingleInstance", out var created);
+        _ownsMutex = created;
         if (!created) { Shutdown(); return; }
 
         BuildTray();
         Engine.Changed += UpdateStatus;
-        Engine.Notify += msg => _tray?.ShowBalloonTip(5000, "ILIAS Sync", msg, ToolTipIcon.Info);
+        Engine.Notify += msg => _tray?.ShowBalloonTip(5000, "Neue Daten synchronisiert", msg, ToolTipIcon.Info);
         Engine.Start();
 
         if (!Engine.Settings.IsConfigured) ShowSettings();
@@ -35,7 +37,8 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _tray?.Dispose();
-        _mutex?.ReleaseMutex();
+        if (_ownsMutex) _mutex?.ReleaseMutex();
+        _mutex?.Dispose();
         base.OnExit(e);
     }
 

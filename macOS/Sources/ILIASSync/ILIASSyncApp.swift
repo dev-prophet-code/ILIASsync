@@ -1,15 +1,27 @@
 import SwiftUI
 import AppKit
+import UserNotifications
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     static var window: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        if Bundle.main.bundleURL.pathExtension == "app" {
+            let c = UNUserNotificationCenter.current()
+            c.delegate = self
+            c.requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        }
         Task { @MainActor in
             SyncEngine.shared.start()
             if !Settings.shared.isConfigured { Self.showSettings() }
         }
+    }
+
+    // Hinweis "Neue Daten synchronisiert" auch anzeigen, wenn die App im Vordergrund ist.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.banner, .list])
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {

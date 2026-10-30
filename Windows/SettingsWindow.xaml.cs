@@ -105,6 +105,7 @@ public partial class SettingsWindow : Window
             s.IntervalMinutes = (int)((ComboBoxItem)IntervalBox.SelectedItem).Tag;
             s.Save();
 
+            App.Engine.ResetLoginBlock();
             App.Engine.Courses = courses;
             BuildCourseList();
             MessageText.Text = $"Verbunden – {courses.Count} Kurse gefunden. Synchronisierung läuft.";

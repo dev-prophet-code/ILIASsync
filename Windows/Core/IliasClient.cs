@@ -18,9 +18,15 @@ public sealed class Course
     public string Title { get; set; } = "";
 }
 
-public sealed class IliasException : Exception
+public class IliasException : Exception
 {
     public IliasException(string message) : base(message) { }
+}
+
+/// <summary>Benutzername/Passwort wurden abgelehnt. Automatische Wiederholungen sind dann sinnlos (Konto-Sperre!).</summary>
+public sealed class LoginFailedException : IliasException
+{
+    public LoginFailedException(string message) : base(message) { }
 }
 
 /// <summary>
@@ -41,6 +47,8 @@ public sealed class IliasClient : IDisposable
         s = s.TrimEnd('/');
         if (!Uri.TryCreate(s, UriKind.Absolute, out var u) || string.IsNullOrEmpty(u.Host))
             throw new IliasException("Die Server-Adresse ist ungültig.");
+        if (u.Scheme != Uri.UriSchemeHttps && !u.IsLoopback)
+            throw new IliasException("Bitte eine https://-Adresse verwenden, sonst würden Zugangsdaten unverschlüsselt gesendet.");
         _base = u;
 
         var handler = new SocketsHttpHandler
@@ -64,10 +72,14 @@ public sealed class IliasClient : IDisposable
 
     public Uri CourseWebUrl(Course c) => GotoUrl(c.Type, c.Id);
 
-    private async Task<(string Html, Uri Url)> Fetch(Uri u)
+    private async Task<(string Html, Uri Url)> Fetch(Uri u, bool requireSession = true)
     {
         using var resp = await _http.GetAsync(u);
+        if (!resp.IsSuccessStatusCode)
+            throw new IliasException($"Server antwortet mit HTTP {(int)resp.StatusCode}.");
         var html = await resp.Content.ReadAsStringAsync();
+        if (requireSession && html.Contains("type=\"password\""))
+            throw new IliasException("Sitzung nicht angemeldet bzw. abgelaufen (ggf. Nutzungsbedingungen oder Passwortwechsel im Browser bestätigen).");
         return (html, resp.RequestMessage?.RequestUri ?? u);
     }
 
@@ -75,16 +87,17 @@ public sealed class IliasClient : IDisposable
 
     public async Task Login(string username, string password)
     {
-        var (html, pageUrl) = await Fetch(Url("login.php"));
+        var (html, pageUrl) = await Fetch(Url("login.php"), requireSession: false);
         var form = Html.Form("type=\"password\"", html)
             ?? throw new IliasException("Anmeldeformular nicht gefunden – stimmt die Server-Adresse?");
 
         var fields = new List<KeyValuePair<string, string>>();
+        string? passName = null;
         bool userDone = false, passDone = false;
         foreach (var f in form.Fields)
         {
             if (f.Type == "hidden") fields.Add(new(f.Name, f.Value));
-            else if (f.Type == "password" && !passDone) { fields.Add(new(f.Name, password)); passDone = true; }
+            else if (f.Type == "password" && !passDone) { fields.Add(new(f.Name, password)); passDone = true; passName = f.Name; }
             else if (f.Type == "text" && !userDone) { fields.Add(new(f.Name, username)); userDone = true; }
             else if (f.Type == "submit" && f.Name.StartsWith("cmd")) fields.Add(new(f.Name, f.Value));
         }
@@ -92,12 +105,14 @@ public sealed class IliasClient : IDisposable
 
         var target = form.Action != null ? new Uri(pageUrl, form.Action) : pageUrl;
         using var resp = await _http.PostAsync(target, new FormUrlEncodedContent(fields));
-        var result = await resp.Content.ReadAsStringAsync();
-        if (result.Contains("type=\"password\""))
+        var body = await resp.Content.ReadAsStringAsync();
+        // Fehlgeschlagen = das Login-Passwortfeld ist noch da. Andere Seiten (z. B. Zwischenschritte) werden
+        // beim nächsten Abruf als "nicht angemeldet" erkannt.
+        if (body.Contains($"name=\"{passName}\""))
         {
-            var m = Regex.Match(result, "alert-danger[^>]*>(.{0,400})", RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            var m = Regex.Match(body, "alert-danger[^>]*>(.{0,400})", RegexOptions.IgnoreCase | RegexOptions.Singleline);
             var msg = m.Success ? Html.StripTags(m.Groups[1].Value).Replace("Fehlermeldung", "").Split('<')[0].Trim() : "";
-            throw new IliasException("Anmeldung fehlgeschlagen: " + (msg.Length == 0 ? "Anmeldename oder Passwort ungültig." : msg));
+            throw new LoginFailedException("Anmeldung fehlgeschlagen: " + (msg.Length == 0 ? "Anmeldename oder Passwort ungültig." : msg));
         }
     }
 
@@ -113,7 +128,9 @@ public sealed class IliasClient : IDisposable
         foreach (var p in pages)
         {
             string html;
-            try { html = (await Fetch(p)).Html; } catch { continue; }
+            try { html = (await Fetch(p)).Html; }
+            catch (IliasException ex) when (ex.Message.StartsWith("Sitzung")) { throw; }
+            catch { continue; }
             var order = new List<string>();
             var found = new Dictionary<string, Course>();
             foreach (var a in Html.Anchors(html))
@@ -201,7 +218,7 @@ public sealed class IliasClient : IDisposable
         var local = File.Exists(dest);
 
         var entry = state.Get(key);
-        if (entry != null && entry.Sig == sig && entry.Path == dest && local)
+        if (entry != null && entry.Sig == sig && File.Exists(entry.Path))
         {
             stats.Unchanged++;
             return;   // unveränderte Datei: Antwort wird verworfen, nichts geladen

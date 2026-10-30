@@ -34,9 +34,10 @@ enum Keychain {
 final class Settings: ObservableObject {
     static let shared = Settings()
     private let d = UserDefaults.standard
+    private var cachedPassword: String?   // Schlüsselbund nicht bei jedem isConfigured abfragen
 
     @Published var serverURL: String { didSet { d.set(serverURL, forKey: "serverURL") } }
-    @Published var username: String { didSet { d.set(username, forKey: "username") } }
+    @Published var username: String { didSet { d.set(username, forKey: "username"); cachedPassword = nil } }
     @Published var syncFolder: String { didSet { d.set(syncFolder, forKey: "syncFolder") } }
     @Published var intervalMinutes: Int { didSet { d.set(intervalMinutes, forKey: "intervalMinutes") } }
     @Published var disabledCourses: [String] { didSet { d.set(disabledCourses, forKey: "disabledCourses") } }
@@ -51,8 +52,13 @@ final class Settings: ObservableObject {
     }
 
     var password: String {
-        get { Keychain.get(account: username) ?? "" }
-        set { Keychain.set(newValue, account: username) }
+        get {
+            if let c = cachedPassword { return c }
+            let p = Keychain.get(account: username) ?? ""
+            cachedPassword = p
+            return p
+        }
+        set { Keychain.set(newValue, account: username); cachedPassword = newValue }
     }
 
     var isConfigured: Bool {
