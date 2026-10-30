@@ -28,7 +28,7 @@ Both apps do the same thing and share the same behavior and safety rules.
 
 ## Download
 
-Ready-to-run apps are available under **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
+Ready-to-run apps are available under **[Releases](https://github.com/dev-prophet-code/ILIASsync/releases/latest)**:
 
 | Platform | File | Notes |
 | --- | --- | --- |
@@ -74,8 +74,8 @@ Ready-to-run apps are available under **[Releases](https://github.com/dev-prophe
 Requires macOS 13+ and Xcode (license accepted; the SwiftUI macros need the Xcode toolchain).
 
 ```bash
-git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
-cd ILIASsyncMac/macOS
+git clone https://github.com/dev-prophet-code/ILIASsync.git
+cd ILIASsync/macOS
 ./build.sh
 open build/ILIASSync.app
 ```
@@ -89,8 +89,8 @@ The app is not notarized; distributing it without a Gatekeeper warning requires 
 Requires the [.NET 8 SDK](https://dotnet.microsoft.com/download) on Windows 10/11.
 
 ```powershell
-git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
-cd ILIASsyncMac\Windows
+git clone https://github.com/dev-prophet-code/ILIASsync.git
+cd ILIASsync\Windows
 .\build.ps1
 .\build\ILIASSync.exe
 ```

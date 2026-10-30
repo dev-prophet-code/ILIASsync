@@ -27,7 +27,7 @@ Beide Apps tun dasselbe und folgen denselben Sicherheitsregeln.
 
 ## Download
 
-Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
+Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsync/releases/latest)**:
 
 | Plattform | Datei | Hinweise |
 | --- | --- | --- |
@@ -72,8 +72,8 @@ Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac
 Benötigt macOS 13+ und Xcode (Lizenz akzeptiert; die SwiftUI-Makros brauchen die Xcode-Toolchain).
 
 ```bash
-git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
-cd ILIASsyncMac/macOS
+git clone https://github.com/dev-prophet-code/ILIASsync.git
+cd ILIASsync/macOS
 ./build.sh
 open build/ILIASSync.app
 ```
@@ -87,8 +87,8 @@ Die App ist nicht notarisiert; für eine Verteilung ohne Gatekeeper-Warnung brau
 Benötigt das [.NET 8 SDK](https://dotnet.microsoft.com/download) unter Windows 10/11.
 
 ```powershell
-git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
-cd ILIASsyncMac\Windows
+git clone https://github.com/dev-prophet-code/ILIASsync.git
+cd ILIASsync\Windows
 .\build.ps1
 .\build\ILIASSync.exe
 ```
