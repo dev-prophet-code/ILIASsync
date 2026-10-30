@@ -1,31 +1,53 @@
-<p align="center"><img src="Resources/AppIcon-1024.png" width="128" alt="ILIAS Sync"></p>
+<p align="center"><img src="macOS/Resources/AppIcon-1024.png" width="128" alt="ILIAS Sync"></p>
 
 # ILIAS Sync
 
 **Deutsch** · [English](README.md)
 
-Kleine macOS-Menüleisten-App, die deine Kurse aus einem [ILIAS](https://github.com/ILIAS-eLearning/ILIAS)-System
-anzeigt und neue oder geänderte Kursdateien automatisch in einen Ordner deiner Wahl herunterlädt.
+Kleine Menüleisten- bzw. Infobereich-App für **macOS** und **Windows**, die deine Kurse aus einem
+[ILIAS](https://github.com/ILIAS-eLearning/ILIAS)-System anzeigt und neue oder geänderte Kursdateien automatisch in
+einen Ordner deiner Wahl herunterlädt.
 
 > **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
 > Andere Versionen und Themes können Anpassungen brauchen.
+> Die macOS-Version lief gegen einen echten ILIAS-Server; die **Windows-Version lässt sich kompilieren, wurde aber
+> noch nicht unter Windows getestet**.
 
-**Stichworte:** ILIAS synchronisieren, ILIAS Kurse herunterladen, ILIAS Mac-App, ILIAS Dateien offline,
-ILIAS Menüleiste, E-Learning, Lernplattform, Swift, SwiftUI.
+**Stichworte:** ILIAS synchronisieren, ILIAS Kurse herunterladen, ILIAS Mac-App, ILIAS Windows-App, ILIAS Dateien
+offline, ILIAS Menüleiste, ILIAS Infobereich, E-Learning, Lernplattform, Swift, SwiftUI, C#, WPF.
+
+## Aufbau des Repos
+
+| Ordner | Inhalt |
+| --- | --- |
+| [`macOS/`](macOS) | macOS-App (Swift, SwiftUI) – Symbol in der Menüleiste |
+| [`Windows/`](Windows) | Windows-App (C#, .NET 8, WPF) – Symbol im Infobereich (Tray) |
+| [`docs/`](docs) | Screenshots |
+
+Beide Apps tun dasselbe und folgen denselben Sicherheitsregeln.
+
+## Download
+
+Fertige Apps unter **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
+
+| Plattform | Datei | Hinweise |
+| --- | --- | --- |
+| macOS 13+ (Apple Silicon & Intel) | `ILIASSync-…-macOS.zip` | Entpacken, `ILIASSync.app` nach „Programme" ziehen. Erster Start: Rechtsklick → **Öffnen** (nicht notarisiert). |
+| Windows 10/11 (x64) | `ILIASSync-…-Windows-x64.zip` | Entpacken und `ILIASSync.exe` starten (keine Installation, .NET ist enthalten). SmartScreen kann warnen, weil die Datei nicht signiert ist: **Weitere Informationen → Trotzdem ausführen**. |
 
 ## Screenshot
 
-<p align="center"><img src="docs/screenshot-einstellungen.png" width="360" alt="Einstellungsfenster (Demo-Daten)"></p>
+<p align="center"><img src="docs/screenshot-macos-einstellungen.png" width="360" alt="Einstellungsfenster unter macOS (Demo-Daten)"></p>
 
 ## Funktionen
 
 - Einrichtung über ein kleines Fenster: Server-Adresse, Benutzername, Passwort, Sync-Ordner, Intervall
-- Danach läuft die App nur noch in der Menüleiste (kein Dock-Symbol)
+- Danach läuft die App nur noch in der Menüleiste (macOS) bzw. im Infobereich (Windows), ohne Dock-Symbol / Taskleistenknopf
 - Menü: **Meine Kurse** (öffnet den Kurs im Browser), **Jetzt synchronisieren**, **Sync-Ordner öffnen**, **Einstellungen**
 - Lädt Dateien aus Kursen und Unterordnern und bildet die Ordnerstruktur lokal nach
 - Einzelne Kurse lassen sich vom Sync ausnehmen
 - Optional: Start beim Anmelden, Benachrichtigung bei neuen Dateien
-- Passwort liegt im macOS-Schlüsselbund
+- Das Passwort wird sicher gespeichert: macOS-Schlüsselbund bzw. Windows-DPAPI (für dein Benutzerkonto verschlüsselt)
 
 ## Sicherheit der lokalen Daten
 
@@ -36,56 +58,61 @@ ILIAS Menüleiste, E-Learning, Lernplattform, Swift, SwiftUI.
   sondern als `Name (neue Version JJJJ-MM-TT HH-mm).ext` daneben gespeichert.
 - Wurde eine Datei in ILIAS gelöscht, bleibt die lokale Kopie erhalten.
 
-## Download
-
-Fertige App (Universal: Apple Silicon und Intel) unter **[Releases](https://github.com/dev-prophet-code/ILIASsyncMac/releases/latest)**:
-`ILIASSync-…-macOS.zip` laden, entpacken und `ILIASSync.app` nach „Programme" ziehen.
-Beim ersten Start: Rechtsklick → **Öffnen** (die App ist nicht notarisiert, siehe unten).
-
-## Voraussetzungen
-
-- macOS 13 oder neuer
-- Zum selbst Bauen: Xcode (inkl. akzeptierter Lizenz) – die SwiftUI-Makros brauchen die Xcode-Toolchain
-
-## Bauen
-
-```bash
-git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
-cd ILIASsyncMac
-./build.sh
-open build/ILIASSync.app
-```
-
-`build.sh` baut das Swift-Package im Release-Modus, erzeugt `build/ILIASSync.app` (mit Icon, `LSUIElement`)
-und signiert es ad hoc. Der Build ist universal (arm64 + x86_64). Liegt Xcode nicht unter `/Applications/Xcode.app`, setze `DEVELOPER_DIR` entsprechend.
-
-### Weitergeben
-
-Die App ist nicht notarisiert. Auf anderen Macs blockiert Gatekeeper sie beim ersten Start:
-Rechtsklick auf die App → **Öffnen** (oder Systemeinstellungen → Datenschutz & Sicherheit → **Trotzdem öffnen**).
-Für eine Verteilung ohne Warnung braucht es eine Apple-Developer-ID und Notarisierung.
-
 ## Benutzung
 
 1. App starten – beim ersten Mal öffnet sich das Einstellungsfenster.
 2. ILIAS-Adresse (z. B. `https://ilias.uni-beispiel.de`), Benutzername und Passwort eintragen, Sync-Ordner wählen.
 3. **Speichern & Verbinden**. Die App meldet sich an, zeigt die Zahl der Kurse und startet den ersten Sync.
-4. Fenster schließen. Das Symbol in der Menüleiste bleibt; Einstellungen erreichst du über das Menü.
+4. Fenster schließen. Das Symbol bleibt in Menüleiste bzw. Infobereich; die Einstellungen erreichst du über das Menü
+   (macOS: auch durch erneutes Starten der App; Windows: Doppelklick auf das Symbol).
+
+## Selbst bauen
+
+### macOS
+
+Benötigt macOS 13+ und Xcode (Lizenz akzeptiert; die SwiftUI-Makros brauchen die Xcode-Toolchain).
+
+```bash
+git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
+cd ILIASsyncMac/macOS
+./build.sh
+open build/ILIASSync.app
+```
+
+`build.sh` baut universal (arm64 + x86_64), erzeugt `build/ILIASSync.app` (mit Icon, `LSUIElement`) und signiert
+ad hoc. Liegt Xcode nicht unter `/Applications/Xcode.app`, setze `DEVELOPER_DIR` entsprechend.
+Die App ist nicht notarisiert; für eine Verteilung ohne Gatekeeper-Warnung braucht es eine Apple-Developer-ID.
+
+### Windows
+
+Benötigt das [.NET 8 SDK](https://dotnet.microsoft.com/download) unter Windows 10/11.
+
+```powershell
+git clone https://github.com/dev-prophet-code/ILIASsyncMac.git
+cd ILIASsyncMac\Windows
+.\build.ps1
+.\build\ILIASSync.exe
+```
+
+`build.ps1` erzeugt eine einzelne, eigenständige `ILIASSync.exe` (win-x64). Zum Entwickeln genügt auch `dotnet run`
+im Ordner `Windows`. Die exe ist nicht signiert, SmartScreen warnt daher auf fremden Rechnern.
 
 ## Wie es funktioniert
 
-ILIAS bietet ohne Admin-Setup keine einfache Schnittstelle für Nutzer. Die App meldet sich deshalb wie ein Browser
-über das Login-Formular an, liest „Meine Kurse" (`ilmembershipoverviewgui`, Fallback Dashboard) aus und durchläuft
+ILIAS bietet ohne Admin-Setup keine einfache Schnittstelle für Nutzer. Die Apps melden sich deshalb wie ein Browser
+über das Login-Formular an, lesen „Meine Kurse" (`ilmembershipoverviewgui`, Fallback Dashboard) aus und durchlaufen
 Kurse und Ordner über `goto.php?target=…`. Dateien werden über `goto.php?target=file_<id>_download` geladen.
 Die Änderungserkennung nutzt `Last-Modified`/`Content-Length` und den SHA-256-Hash.
 
-Der lokale Sync-Status liegt in `~/Library/Application Support/ILIASSync/state.json`.
+Lokaler Sync-Status: macOS `~/Library/Application Support/ILIASSync/state.json`,
+Windows `%APPDATA%\ILIASSync\state.json`.
 
 ## Bekannte Einschränkungen
 
 - Kein Single-Sign-on (Shibboleth, CAS, …), nur Anmeldung mit Benutzername und Passwort
 - Es werden nur Dateien geladen, keine Lernmodule, Foren, Links oder Gruppenordner
 - Das Auslesen der HTML-Seiten kann bei anderen ILIAS-Versionen/Themes abweichen
+- Windows: sehr lange Pfade (> 260 Zeichen) können fehlschlagen, wenn lange Pfade in Windows nicht aktiviert sind
 
 ## Lizenz
 

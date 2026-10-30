@@ -1,0 +1,43 @@
+<Window x:Class="ILIASSync.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ILIAS Sync – Einstellungen" Width="480" SizeToContent="Height"
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Icon="pack://application:,,,/Resources/AppIcon.ico">
+    <StackPanel Margin="20">
+        <TextBlock Text="Server" FontWeight="SemiBold" Margin="0,0,0,6"/>
+        <TextBlock Text="ILIAS-Adresse"/>
+        <TextBox x:Name="ServerBox" Margin="0,2,0,12"/>
+
+        <TextBlock Text="Zugangsdaten" FontWeight="SemiBold" Margin="0,4,0,6"/>
+        <TextBlock Text="Benutzername"/>
+        <TextBox x:Name="UserBox" Margin="0,2,0,8"/>
+        <TextBlock Text="Passwort"/>
+        <PasswordBox x:Name="PasswordBox" Margin="0,2,0,12"/>
+
+        <TextBlock Text="Synchronisierung" FontWeight="SemiBold" Margin="0,4,0,6"/>
+        <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="FolderText" Text="Kein Ordner gewählt" Foreground="Gray"
+                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="Wählen …" Padding="10,2" Click="ChooseFolder_Click"/>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Intervall" VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <ComboBox x:Name="IntervalBox" Width="130"/>
+        </StackPanel>
+        <CheckBox x:Name="AutostartBox" Content="Beim Anmelden starten" Margin="0,0,0,12"/>
+
+        <StackPanel x:Name="CoursesPanel" Visibility="Collapsed" Margin="0,0,0,12">
+            <TextBlock Text="Kurse synchronisieren" FontWeight="SemiBold" Margin="0,0,0,6"/>
+            <ItemsControl x:Name="CoursesList"/>
+        </StackPanel>
+
+        <Button x:Name="SaveButton" Content="Speichern &amp; Verbinden" HorizontalAlignment="Left"
+                Padding="14,4" Click="Save_Click"/>
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" Foreground="Gray" Margin="0,10,0,0"/>
+    </StackPanel>
+</Window>
