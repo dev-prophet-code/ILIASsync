@@ -10,7 +10,7 @@
     <AssemblyName>ILIASSync</AssemblyName>
     <RootNamespace>ILIASSync</RootNamespace>
     <ApplicationIcon>Resources\AppIcon.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <SatelliteResourceLanguages>de</SatelliteResourceLanguages>
   </PropertyGroup>

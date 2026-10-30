@@ -8,7 +8,7 @@ A small menu bar / system tray app for **macOS** and **Windows** that shows your
 [ILIAS](https://github.com/ILIAS-eLearning/ILIAS) system and automatically downloads new or changed course files
 into a folder of your choice.
 
-> **Status:** early version (0.1). So far only tested against an ILIAS installation using the newer UI framework.
+> **Status:** early version (0.2). So far only tested against an ILIAS installation using the newer UI framework.
 > Other versions and themes may need adjustments.
 > Tested and working on **macOS** and **Windows**.
 > **Note:** the user interface of both apps is in German.

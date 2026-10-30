@@ -8,7 +8,7 @@ Kleine Menüleisten- bzw. Infobereich-App für **macOS** und **Windows**, die de
 [ILIAS](https://github.com/ILIAS-eLearning/ILIAS)-System anzeigt und neue oder geänderte Kursdateien automatisch in
 einen Ordner deiner Wahl herunterlädt.
 
-> **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
+> **Status:** frühe Version (0.2). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
 > Andere Versionen und Themes können Anpassungen brauchen.
 > Getestet und funktionsfähig unter **macOS** und **Windows**.
 
