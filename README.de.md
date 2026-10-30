@@ -10,8 +10,7 @@ einen Ordner deiner Wahl herunterlädt.
 
 > **Status:** frühe Version (0.1). Bisher nur gegen eine ILIAS-Installation mit dem neueren UI-Framework getestet.
 > Andere Versionen und Themes können Anpassungen brauchen.
-> Die macOS-Version lief gegen einen echten ILIAS-Server; die **Windows-Version lässt sich kompilieren, wurde aber
-> noch nicht unter Windows getestet**.
+> Getestet und funktionsfähig unter **macOS** und **Windows**.
 
 **Stichworte:** ILIAS synchronisieren, ILIAS Kurse herunterladen, ILIAS Mac-App, ILIAS Windows-App, ILIAS Dateien
 offline, ILIAS Menüleiste, ILIAS Infobereich, E-Learning, Lernplattform, Swift, SwiftUI, C#, WPF.

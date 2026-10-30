@@ -10,8 +10,7 @@ into a folder of your choice.
 
 > **Status:** early version (0.1). So far only tested against an ILIAS installation using the newer UI framework.
 > Other versions and themes may need adjustments.
-> The macOS version was run against a real ILIAS server; the **Windows version compiles but has not been tested on
-> Windows yet**.
+> Tested and working on **macOS** and **Windows**.
 > **Note:** the user interface of both apps is in German.
 
 **Keywords:** ILIAS sync, ILIAS downloader, ILIAS client for macOS and Windows, synchronize ILIAS courses,
