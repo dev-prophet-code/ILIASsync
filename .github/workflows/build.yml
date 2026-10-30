@@ -1,0 +1,48 @@
+name: Build
+
+# Prüft bei jedem Push/Pull Request, dass beide Apps noch bauen, und stellt die Ergebnisse als Download bereit.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (universal)
+        working-directory: macOS
+        run: ./build.sh
+      - name: Zip
+        run: ditto -c -k --keepParent macOS/build/ILIASSync.app ILIASSync-macOS.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ILIASSync-macOS
+          path: ILIASSync-macOS.zip
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build (win-x64, single file)
+        working-directory: Windows
+        run: ./build.ps1
+        shell: pwsh
+      - name: Zip
+        run: Compress-Archive -Path Windows/build/ILIASSync.exe -DestinationPath ILIASSync-Windows-x64.zip
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ILIASSync-Windows-x64
+          path: ILIASSync-Windows-x64.zip

@@ -1,0 +1,65 @@
+name: Release
+
+# Bei einem Tag wie v0.2.0 werden beide Apps gebaut und als Release veröffentlicht.
+# Tags mit Bindestrich (z. B. v0.2.0-beta1) werden als Vorabversion markiert.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build (universal)
+        working-directory: macOS
+        run: ./build.sh
+      - name: Zip
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          ditto -c -k --keepParent macOS/build/ILIASSync.app "ILIASSync-${VERSION}-macOS.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: ILIASSync-*-macOS.zip
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Build (win-x64, single file)
+        working-directory: Windows
+        run: ./build.ps1
+        shell: pwsh
+      - name: Zip
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart('v')
+          Compress-Archive -Path Windows/build/ILIASSync.exe -DestinationPath "ILIASSync-$v-Windows-x64.zip"
+        shell: pwsh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: ILIASSync-*-Windows-x64.zip
+
+  release:
+    name: Release veröffentlichen
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
